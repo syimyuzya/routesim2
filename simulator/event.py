@@ -5,6 +5,8 @@ from simulator.config import *
 
 class Event:
 
+    next_seq = 1
+
     def __init__(self, time_stamp, event_type, sim, arg1 = -1, arg2 = -1, arg3 = -1):
         self.time_stamp = time_stamp
         self.event_type = event_type
@@ -14,10 +16,16 @@ class Event:
         self.arg2 = arg2
         self.arg3 = arg3
 
+        if self.event_type == EVENT_TYPE.SEND_LINK:
+            self.send_link_seq = Event.next_seq
+            Event.next_seq += 1
+
     def __lt__(self, other):
         if self.time_stamp == other.time_stamp:
             if self.event_type != EVENT_TYPE.SEND_LINK and other.event_type == EVENT_TYPE.SEND_LINK:
                 return True
+            if self.event_type == other.event_type == EVENT_TYPE.SEND_LINK:
+                return self.send_link_seq < other.send_link_seq
         return self.time_stamp < other.time_stamp
 
     def __str__(self):
@@ -29,7 +37,12 @@ class Event:
         if self.arg3 != -1:
             args += " " + str(self.arg3)
 
-        return "Time_Stamp: " + str(self.time_stamp) + " Event_Type: " + self.event_type + args
+        return "Time_Stamp: " + str(self.time_stamp) \
+                + " Event_Type: " + self.event_type \
+                + ('(seq={})'.format(self.send_link_seq)
+                        if self.event_type == EVENT_TYPE.SEND_LINK
+                        else '') \
+                + args
 
     def dispatch(self):
         if self.event_type == EVENT_TYPE.ADD_NODE:
