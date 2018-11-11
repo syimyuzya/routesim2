@@ -16,7 +16,7 @@ class Event:
 
     def __lt__(self, other):
         if self.time_stamp == other.time_stamp:
-            if self.event_type != EVENT_TYPE.SEND_LINK and other.event_type == EVENT_TYPE.SEND_LINK:
+            if self.event_type == EVENT_TYPE.SEND_LINK and other.event_type != EVENT_TYPE.SEND_LINK:
                 return True
         return self.time_stamp < other.time_stamp
 
